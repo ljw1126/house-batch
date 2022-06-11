@@ -33,10 +33,10 @@ public class Lawd {
     @Column(nullable = false)
     private Boolean exist;
 
-    @CreatedDate  // jpa에서 생성시 날짜 넣어줌 (물론 위에 설정 필요)
+    @CreatedDate  // jpa에서 생성시 날짜 넣어줌 (물론 위에 @EntityListeners 설정 필요)
     private LocalDateTime createdAt;
 
     @LastModifiedDate  // jpa에서 수정시 날짜 넣어줌
-    private LocalDateTime updatedAd;
+    private LocalDateTime updatedAt;
 
 }

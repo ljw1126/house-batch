@@ -2,6 +2,7 @@ package com.fastcampus.housebatch.job.lawd;
 
 import com.fastcampus.housebatch.core.entity.Lawd;
 import com.fastcampus.housebatch.job.validator.FilePathParameterValidator;
+import com.fastcampus.housebatch.service.LawdService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -31,6 +32,8 @@ public class LawdInsertJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
+    private final LawdService lawdService;
+
     @Bean
     public Job lawdInsertJob(Step lawdInsertStep) {
         return jobBuilderFactory.get("lawdInsertJob")
@@ -39,7 +42,7 @@ public class LawdInsertJobConfig {
                 .start(lawdInsertStep)
                 .build();
     }
-
+    // chunkSize : 1000개 데이터를 읽고 쓰고
     @JobScope
     @Bean
     public Step lawdInsertStep(FlatFileItemReader<Lawd> lawdFlatFileItemReader,
@@ -77,11 +80,6 @@ public class LawdInsertJobConfig {
     @Bean
     @StepScope
     public ItemWriter<Lawd> lawdItemWriter() {
-        return new ItemWriter<Lawd>() {
-            @Override
-            public void write(List<? extends Lawd> items) throws Exception {
-                items.forEach(System.out::println);
-            }
-        };
+        return items -> items.forEach(lawdService::upsert);
     }
 }
