@@ -6,3 +6,7 @@
    2. 시/군/구 (2)
    3. 읍/면/동 (4)
    4. 리 (2)
+
+#### 법정동 코드 배치 실행 
+- edit configuration 수정 후 실행하기 (정상동작 확인)
+> --spring.profiles.active=local --spring.batch.job.names=lawdInsertJob -filePath=LAWD_CODE_EXAMPLE.txt
