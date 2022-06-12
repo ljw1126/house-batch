@@ -42,7 +42,13 @@ public class GuLawdTasklet implements Tasklet {
         }
 
         itemCount--;
+        /*
+            1. 실수 point
+            chunkContext.getStepContext().getJobExecutionContext().put(KEY_GU_LAWD_CD, guLawdCds.get(itemCount));
+            -> 에러 발생
+            -> chunkContext.getStepContext().getJobExecutionContext() return 이 unmodifiedMap이라 put 하면 unsupport 에러 뜸
 
+        */
         executionContext.putString(KEY_GU_LAWD_CD, guLawdCds.get(itemCount));
         executionContext.putInt(KEY_ITEM_COUNT, itemCount);
 

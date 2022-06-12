@@ -70,6 +70,21 @@ public class AptDealInsertJobConfig {
         return new GuLawdTasklet(lawdRepository);
     }
 
+    /**
+     2. 실수 point
+     .. 이렇게 선언 할 경우 실행은 되지만 guLawdCd가 동일한 값만 출력됨!
+     Step은 실행할때 한번만 주입받기 때문에 jobExecutionContext 값이 한번만 받아짐..
+     그래서 아래와 같이 변경하면 동일한 값만 계속 호출하는 결과가 됨 (하지 말자)
+     public Step contextPrintStep(@Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd) {
+
+     return stepBuilderFactory.get("contextPrintStep")
+                 .tasklet((contribution, chunkContext) -> {
+                     System.out.println("jobExecutionContext['guLawdCd'] > " + guLawdCd);
+                     return RepeatStatus.FINISHED;
+                 })
+                 .build();
+     }
+     */
     @JobScope
     @Bean
     public Step contextPrintStep(Tasklet contextPrintTasklet) {

@@ -212,3 +212,5 @@ YearMonth ym = YearMonth.parse(text, f);
 - ExecutionContext 나 cache를 사용하는 경우는 테이블에 변경이 자주 일어나는 서비스일때 DB부담 주기 어려우면 사용하도록 
   - 변경이 자주 일어나지 않는다면 매번 쿼리 조회해도 상관은 없음. 
   - 개발자 판단👨‍💻
+
+## 20. ExecutionContext 주의사항 
