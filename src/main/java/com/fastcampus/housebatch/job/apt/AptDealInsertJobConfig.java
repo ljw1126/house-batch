@@ -86,7 +86,7 @@ public class AptDealInsertJobConfig {
     ) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(apartmentApiResource.getResource(lawdCd, YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyyMM"))))
+                .resource(apartmentApiResource.getResource(lawdCd, YearMonth.parse(yearMonth)))
                 .addFragmentRootElements("item")
                 .unmarshaller(aptDealDtoMarshaller)
                 .build();

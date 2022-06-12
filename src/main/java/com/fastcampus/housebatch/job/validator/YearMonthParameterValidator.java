@@ -24,7 +24,7 @@ public class YearMonthParameterValidator implements JobParametersValidator {
         }
 
         try {
-            YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyyMM")); // parse 에러시 DateTimeParseException 던짐
+            YearMonth.parse(yearMonth); // parse 에러시 DateTimeParseException 던짐
         } catch (DateTimeParseException dateTimeParseException) {
             throw new JobParametersInvalidException(yearMonth + "가 올바른 날짜 형식이 아닙니다. yyyyMM");
         }

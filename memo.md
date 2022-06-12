@@ -142,7 +142,7 @@ command :
 - validator 2개 추가 후 CompositeJobParametersValidator 클래스로 등록 후 사용
 
 #### 호출 테스트 
-> --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -lawdCd=11110 -yearMonth=201512
+> --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -lawdCd=11110 -yearMonth=201512   // 2015-12 이런식으로 줬구나..
 
 #### 에러 
 - YearMonth.parse() 의 default 포맷에 '-'가 들어가는 것으로 파악 .. fomatter 정의해줘야 함
@@ -156,3 +156,5 @@ YearMonth ym = YearMonth.parse(text, f);
 ```
 
 - 수정 후 정상 동작 확인 
+- 아래와 같이 YYYY-MM 형식으로 보내면, DateTimeFormatter 필요없이 잘 동작함
+> --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -lawdCd=11110 -yearMonth=2015-12
