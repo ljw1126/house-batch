@@ -201,3 +201,14 @@ YearMonth ym = YearMonth.parse(text, f);
 
 #### edit configuration 
 > --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -yearMonth=2021-08
+
+## 18. Conditional Flow Step
+- 조건에 따라 step 에서 다른 step으로 분기 가능하도록 함 
+#### Conditional Flow 공식 문서
+> https://docs.spring.io/spring-batch/docs/current/reference/html/index-single.html#conditionalFlow
+
+#### 정리 
+- ExecutionContext 활용해서 갑 설정 있는 경우, 없는 경우에 대한 처리 해줌 👉 Tasklet GuLawdCdTasklet()
+- ExecutionContext 나 cache를 사용하는 경우는 테이블에 변경이 자주 일어나는 서비스일때 DB부담 주기 어려우면 사용하도록 
+  - 변경이 자주 일어나지 않는다면 매번 쿼리 조회해도 상관은 없음. 
+  - 개발자 판단👨‍💻
