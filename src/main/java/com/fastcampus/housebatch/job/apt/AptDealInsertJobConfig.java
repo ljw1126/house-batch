@@ -1,5 +1,6 @@
 package com.fastcampus.housebatch.job.apt;
 
+import com.fastcampus.housebatch.adaptor.ApartmentApiResource;
 import com.fastcampus.housebatch.core.dto.AptDealDto;
 import com.fastcampus.housebatch.job.validator.FilePathParameterValidator;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
+import java.time.YearMonth;
+
 @Configuration
 @AllArgsConstructor
 @Slf4j
@@ -27,6 +30,7 @@ public class AptDealInsertJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
+    private final ApartmentApiResource apartmentApiResource;
 
     // jobParameter validator : edit configuration에서 설정한 값에 대한 유효성 검사
     // new FilePathParameterValidator() 대신 bean으로 생성해서 해도 되고(매개변수 주입방식), 편한대로 하면됨
@@ -34,7 +38,6 @@ public class AptDealInsertJobConfig {
     public Job aptDealInsertJob(Step aptDealInsertStep) {
         return jobBuilderFactory.get("aptDealInsertJob")
                 .incrementer(new RunIdIncrementer())
-                .validator(new FilePathParameterValidator())
                 .start(aptDealInsertStep)
                 .build();
     }
@@ -60,12 +63,11 @@ public class AptDealInsertJobConfig {
     @StepScope
     @Bean
     public StaxEventItemReader<AptDealDto> aptDealResourceReader(
-            @Value("#{jobParameters['filePath']}") String filePath,
             Jaxb2Marshaller aptDealDtoMarshaller
     ) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(new ClassPathResource(filePath))
+                .resource(apartmentApiResource.getResource("41135", YearMonth.of(2021, 7)))
                 .addFragmentRootElements("item")
                 .unmarshaller(aptDealDtoMarshaller)
                 .build();
