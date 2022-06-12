@@ -134,3 +134,25 @@ command :
 	implementation 'com.sun.xml.bind:jaxb-impl:2.2.11'
 	implementation 'javax.activation:activation:1.1.1'
 ```
+
+#### sample 파일로 호출 테스트 
+> --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -filePath=apartment-api-response.xml
+
+## 11. 실거래가 배치
+- validator 2개 추가 후 CompositeJobParametersValidator 클래스로 등록 후 사용
+
+#### 호출 테스트 
+> --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -lawdCd=11110 -yearMonth=201512
+
+#### 에러 
+- YearMonth.parse() 의 default 포맷에 '-'가 들어가는 것으로 파악 .. fomatter 정의해줘야 함
+> Caused by: org.springframework.batch.core.JobParametersInvalidException: 201512가 올바른 날짜 형식이 아닙니다. yyyyMM
+
+```text
+//예시
+DateTimeFormatter f = DateTimeFormatter.ofPattern("MMM-uuuu"); // 나는 yyyyMM 포맷
+String text = "Jun-2017";
+YearMonth ym = YearMonth.parse(text, f);
+```
+
+- 수정 후 정상 동작 확인 
