@@ -158,3 +158,35 @@ YearMonth ym = YearMonth.parse(text, f);
 - 수정 후 정상 동작 확인 
 - 아래와 같이 YYYY-MM 형식으로 보내면, DateTimeFormatter 필요없이 잘 동작함
 > --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -lawdCd=11110 -yearMonth=2015-12
+
+## 13. 구 코드 쿼리 
+
+```text
+[가설]
+	1. lawd_dong '동' 문자열이 포함된 데이터 조회 -> 5자리를 사용하면 되지 않을까?
+       -> 군 데이터의 경우 '리' 나 '읍'으로 끝나기 때문에 동이 들어간 데이터만 가져오면 불러와 지지 않는다. 
+    
+    2. distinct, substring 활용 -- 첫번재부터 5개    
+       ㄴ 서울특별시와 같은 (11000) 코드 사용하면 안됨 
+    select distinct substring(lawd_cd, 1, 5) from lawd  
+	where exist = 1;
+	
+	3. 시, 도에 관한 코드를 제거 해야 함 (0이 8개 끝나는 애들 처리해줘야 함)
+    select distinct substring(lawd_cd, 1, 5) from lawd 
+	where exist = 1 and lawd_cd not like '%00000000';
+```
+#### 해당 쿼리 사용 
+> select distinct substring(lawd_cd, 1, 5) from lawd where exist = 1 and lawd_cd not like '%00000000';
+
+## 14. @Query 
+#### 공식 문서 
+> https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.at-query
+
+## 15. 구 코드 읽는 step 
+- 쿼리로 호출한거 테스트 출력 진행(tasklet 으로 간단히)
+#### 에러 발생 
+> Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'lawdRepository' defined in com.fastcampus.housebatch.core.repository.LawdRepository defined in @EnableJpaRepositories declared on JpaRepositoriesRegistrar.EnableJpaRepositoriesConfiguration: Invocation of init method failed; nested exception is org.springframework.data.repository.query.QueryCreationException: Could not create query for public abstract java.util.List com.fastcampus.housebatch.core.repository.LawdRepository.findDistinctGuLawdCd()! Reason: Validation failed for query for method public abstract java.util.List com.fastcampus.housebatch.core.repository.LawdRepository.findDistinctGuLawdCd()!; nested exception is java.lang.IllegalArgumentException: Validation failed for query for method public abstract java.util.List com.fastcampus.housebatch.core.repository.LawdRepository.findDistinctGuLawdCd()!
+
+#### 해결 
+- @Query 정의시 Entity 에 선언한 대로 Lawd, lawdCd 사용해야 하는데 '_' 사용하거나 소문자 사용해서 에러 발생
+> @Query("select distinct substring(l.lawdCd, 1, 5) from Lawd l where l.exist = 1 and l.lawdCd not like '%00000000'")
