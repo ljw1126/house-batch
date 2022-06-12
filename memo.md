@@ -113,3 +113,23 @@ command :
 </body>
 </response>
 ```
+
+--- 
+
+## 7. XmlReader 만들기 
+- API 응답 파일을 Reading 
+  - StaxEventItemReader (spring batch 지원 클래스)
+- AptDealDto 
+  - 마샬러 dependency 추가
+
+--- 
+> API 데이터를 사용할 경우, sample 파일을 만들어 parsing 테스트 해 본 후 작업 진행 하는게 좋다.
+
+#### dependency 추가 
+```text
+    implementation 'org.springframework:spring-oxm'
+	implementation 'javax.xml.bind:jaxb-api:2.2.11'
+	implementation 'com.sun.xml.bind:jaxb-core:2.2.11'
+	implementation 'com.sun.xml.bind:jaxb-impl:2.2.11'
+	implementation 'javax.activation:activation:1.1.1'
+```
