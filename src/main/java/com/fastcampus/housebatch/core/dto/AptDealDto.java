@@ -12,10 +12,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @ToString
 @Getter
-@Setter
 @XmlRootElement(name = "item") // jaxb 라이브러리 통해 parsing 수월하게 해줌
 public class AptDealDto {
-    // XML API 요소 맵핑
+    // XML API 각 요소 맵핑
     @XmlElement(name = "거래금액")
     private String dealAmount;
 

@@ -118,10 +118,11 @@ command :
 
 ## 7. XmlReader 만들기 
 - API 응답 파일을 Reading 
-  - StaxEventItemReader (spring batch 지원 클래스)
+  - StaxEventItemReader (spring batch 지원 클래스) ✨ 대용량 file 내용 읽어서 처리시 용이(chunkSize)
+  - 마샬러 dependency 추가 👉 StaxEventItemReader 에서 사용하기 위해, xml -> dto mapping 설정 용도
 - AptDealDto 
-  - 마샬러 dependency 추가
-
+  
+> framework에서 제공하는 구현체 활용하면 xml parsing과 같이 복잡했던 작업을 수월하게 처리 가능!👨‍💻
 --- 
 > API 데이터를 사용할 경우, sample 파일을 만들어 parsing 테스트 해 본 후 작업 진행 하는게 좋다.
 
