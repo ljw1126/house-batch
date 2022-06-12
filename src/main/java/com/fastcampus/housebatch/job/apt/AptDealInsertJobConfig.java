@@ -3,19 +3,19 @@ package com.fastcampus.housebatch.job.apt;
 import com.fastcampus.housebatch.adaptor.ApartmentApiResource;
 import com.fastcampus.housebatch.core.dto.AptDealDto;
 import com.fastcampus.housebatch.core.repository.LawdRepository;
-import com.fastcampus.housebatch.job.validator.FilePathParameterValidator;
-import com.fastcampus.housebatch.job.validator.LawdCdParameterValidator;
 import com.fastcampus.housebatch.job.validator.YearMonthParameterValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.*;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersValidator;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.CompositeJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
@@ -25,11 +25,9 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class AptDealInsertJobConfig {
     // jobParameter validator : edit configuration에서 설정한 값에 대한 유효성 검사
     // new FilePathParameterValidator() 대신 bean으로 생성해서 해도 되고(매개변수 주입방식), 편한대로 하면됨
     @Bean
-    public Job aptDealInsertJob(//Step aptDealInsertStep,
+    public Job aptDealInsertJob(Step aptDealInsertStep,
                                 Step guLawdCdStep,
                                 Step contextPrintStep) {
         return jobBuilderFactory.get("aptDealInsertJob")
@@ -54,6 +52,7 @@ public class AptDealInsertJobConfig {
                 //.validator(aptDealJobParametersValidator())
                 .start(guLawdCdStep)
                 .next(contextPrintStep)
+                .next(aptDealInsertStep)
                 .build();
     }
 
@@ -61,8 +60,7 @@ public class AptDealInsertJobConfig {
     private JobParametersValidator aptDealJobParametersValidator() {
         CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
         validator.setValidators(Arrays.asList(
-            new YearMonthParameterValidator(),
-            new LawdCdParameterValidator()
+            new YearMonthParameterValidator()
         ));
         return validator;
     }
@@ -133,11 +131,11 @@ public class AptDealInsertJobConfig {
     public StaxEventItemReader<AptDealDto> aptDealResourceReader(
             Jaxb2Marshaller aptDealDtoMarshaller,
             @Value("#{jobParameters['yearMonth']}") String yearMonth,
-            @Value("#{jobParameters['lawdCd']}") String lawdCd
+            @Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd
     ) {
         return new StaxEventItemReaderBuilder<AptDealDto>()
                 .name("aptDealResourceReader")
-                .resource(apartmentApiResource.getResource(lawdCd, YearMonth.parse(yearMonth)))
+                .resource(apartmentApiResource.getResource(guLawdCd, YearMonth.parse(yearMonth)))
                 .addFragmentRootElements("item")
                 .unmarshaller(aptDealDtoMarshaller)
                 .build();

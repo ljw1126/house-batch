@@ -195,3 +195,9 @@ YearMonth ym = YearMonth.parse(text, f);
 ## 16. 두 개의 reader를 어떻게 처리할까?
 #### ExecutionContext 공식 문서 
 > https://docs.spring.io/spring-batch/docs/current/reference/html/index-single.html#executioncontext
+
+## 17. ExecutionContext 활용 
+> jobParameter로 받던 lawdCd를 이제 jobExecutionContext 받도록 수정 (yearMonth 그대로 , 설정 파라미터 필요)
+
+#### edit configuration 
+> --spring.profiles.active=local --spring.batch.job.names=aptDealInsertJob -yearMonth=2021-08
