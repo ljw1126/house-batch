@@ -8,10 +8,7 @@ import com.fastcampus.housebatch.job.validator.LawdCdParameterValidator;
 import com.fastcampus.housebatch.job.validator.YearMonthParameterValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParametersValidator;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -20,6 +17,7 @@ import org.springframework.batch.core.job.CompositeJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.batch.item.xml.builder.StaxEventItemReaderBuilder;
@@ -33,6 +31,7 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @AllArgsConstructor
@@ -48,11 +47,13 @@ public class AptDealInsertJobConfig {
     // new FilePathParameterValidator() 대신 bean으로 생성해서 해도 되고(매개변수 주입방식), 편한대로 하면됨
     @Bean
     public Job aptDealInsertJob(//Step aptDealInsertStep,
-                                Step guLawdCdStep) {
+                                Step guLawdCdStep,
+                                Step contextPrintStep) {
         return jobBuilderFactory.get("aptDealInsertJob")
                 .incrementer(new RunIdIncrementer())
                 //.validator(aptDealJobParametersValidator())
                 .start(guLawdCdStep)
+                .next(contextPrintStep)
                 .build();
     }
 
@@ -78,7 +79,32 @@ public class AptDealInsertJobConfig {
     @Bean
     public Tasklet GuLawdCdTasklet() {
         return (contribution, chunkContext) -> {
-            lawdRepository.findDistinctGuLawdCd().forEach(System.out::println);
+            StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+            ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
+
+            List<String> guLawdCds = lawdRepository.findDistinctGuLawdCd();
+            executionContext.putString("guLawdCd", guLawdCds.get(0)); // 0번째에 무조건 있다고 가정(확인용)
+
+            return RepeatStatus.FINISHED;
+        };
+    }
+
+    @JobScope
+    @Bean
+    public Step contextPrintStep(Tasklet contextPrintTasklet) {
+        return stepBuilderFactory.get("contextPrintStep")
+                .tasklet(contextPrintTasklet)
+                .build();
+    }
+
+    // ExecutionContext 값을 출력해주는 용도
+    @StepScope
+    @Bean
+    public Tasklet contextPrintTasklet(
+            @Value("#{jobExecutionContext['guLawdCd']}") String guLawdCd
+    ) {
+        return (contribution, chunkContext) -> {
+            System.out.println("jobExecutionContext['guLawdCd'] > " + guLawdCd);
             return RepeatStatus.FINISHED;
         };
     }
@@ -96,6 +122,7 @@ public class AptDealInsertJobConfig {
                 .build();
     }
     /*
+     #XML 스탭 응답 처리
      edit configuration 에 filePath 설정값 넣어줌 -> @Value("#{jobParameters['filePath']}") String filePath
      resource : 해당 filePath 에 있는 파일을 읽겠다.
      addFragmentRootElements : 각 데이터의 root 가 어딘지 reader 한테도 알려줘야함

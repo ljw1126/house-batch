@@ -190,3 +190,8 @@ YearMonth ym = YearMonth.parse(text, f);
 #### 해결 
 - @Query 정의시 Entity 에 선언한 대로 Lawd, lawdCd 사용해야 하는데 '_' 사용하거나 소문자 사용해서 에러 발생
 > @Query("select distinct substring(l.lawdCd, 1, 5) from Lawd l where l.exist = 1 and l.lawdCd not like '%00000000'")
+
+
+## 16. 두 개의 reader를 어떻게 처리할까?
+#### ExecutionContext 공식 문서 
+> https://docs.spring.io/spring-batch/docs/current/reference/html/index-single.html#executioncontext
