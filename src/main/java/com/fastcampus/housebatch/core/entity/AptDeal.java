@@ -43,13 +43,13 @@ public class AptDeal {
 
     @CreatedDate
     @Column(nullable = false)
-    private LocalDateTime cratedAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public static AptDeal from(AptDealDto dto, Apt apt) {
+    public static AptDeal of(AptDealDto dto, Apt apt) {
         AptDeal aptDeal = new AptDeal();
         aptDeal.setApt(apt);
         aptDeal.setExclusiveArea(dto.getExclusiveArea());

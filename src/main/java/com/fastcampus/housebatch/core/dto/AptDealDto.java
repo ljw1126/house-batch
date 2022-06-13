@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /**
  * 아파트 실거래가 각각의 정보를 담는 객체 ( from XML )
@@ -43,6 +44,11 @@ public class AptDealDto {
 
     @XmlElement(name = "지번")
     private String jibun;
+
+    //지번 태그 자체가 없는 경우에 대해 처리
+    public String getJibun() {
+        return Optional.ofNullable(jibun).orElse("");
+    }
 
     @XmlElement(name = "지역코드")
     private String regionalCode;

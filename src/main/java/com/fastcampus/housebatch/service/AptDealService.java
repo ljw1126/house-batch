@@ -29,11 +29,11 @@ public class AptDealService {
                 .orElseGet(() -> Apt.from(dto));
         return aptRepository.save(apt);
     }
-
+    // 정적 생성자 메서드명을 지을 때 매개변수가 하나면 from , 매개변수가 2개면 of 사용 ( 이펙티브 자바 )
     private void saveAptDeal(AptDealDto dto, Apt apt) {
         AptDeal aptDeal = aptDealRepository.findAptDealByAptAndExclusiveAreaAndDealDateAndDealAmountAndFloor(
                         apt, dto.getExclusiveArea(), dto.getDealDate(), dto.getDealAmount(), dto.getFloor())
-                .orElseGet(() -> AptDeal.from(dto, apt));
+                .orElseGet(() -> AptDeal.of(dto, apt));
 
         aptDeal.setDealCanceled(dto.isDealCanceled());
         aptDeal.setDealCanceledDate(dto.getDealCanceledDate());
