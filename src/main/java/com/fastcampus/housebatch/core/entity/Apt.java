@@ -40,7 +40,7 @@ public class Apt {
     private LocalDateTime updatedAt;
 
     // id나 createDate, lastMOdi- 는 알아서 만들어주니 생략
-    public static Apt of(AptDealDto dto) {
+    public static Apt from(AptDealDto dto) {
         Apt apt = new Apt();
         apt.setAptName(dto.getAptName().trim()); // 정규화 : 띄어쓰기 제거
         apt.setJibun(dto.getJibun().trim());

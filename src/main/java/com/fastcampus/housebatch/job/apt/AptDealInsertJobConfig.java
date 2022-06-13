@@ -4,6 +4,7 @@ import com.fastcampus.housebatch.adaptor.ApartmentApiResource;
 import com.fastcampus.housebatch.core.dto.AptDealDto;
 import com.fastcampus.housebatch.core.repository.LawdRepository;
 import com.fastcampus.housebatch.job.validator.YearMonthParameterValidator;
+import com.fastcampus.housebatch.service.AptDealService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
@@ -42,14 +43,15 @@ public class AptDealInsertJobConfig {
     @Bean
     public Job aptDealInsertJob(
                                 Step guLawdCdStep,
-                                Step contextPrintStep
+                                Step aptDealInsertStep
+                                //Step contextPrintStep
                                 //Step aptDealInsertStep
     ) {
         return jobBuilderFactory.get("aptDealInsertJob")
                 .incrementer(new RunIdIncrementer())
                 .validator(new YearMonthParameterValidator())
                 .start(guLawdCdStep)
-                .on("CONTINUABLE").to(contextPrintStep).next(guLawdCdStep)
+                .on("CONTINUABLE").to(aptDealInsertStep).next(guLawdCdStep)
                 .from(guLawdCdStep)
                 .on("*").end()
                 .end()
@@ -151,10 +153,10 @@ public class AptDealInsertJobConfig {
     // 어노테이션 지우고 private 로 해서 호출사용해도 됨 ( team convention )
     @StepScope
     @Bean
-    public ItemWriter<AptDealDto> aptDealWriter() {
+    public ItemWriter<AptDealDto> aptDealWriter(AptDealService aptDealService) {
         return items -> {
-            items.forEach(System.out::println);
-            System.out.println("========= Writing Completed============");
+            items.forEach(aptDealService::upsert);
+            System.out.println("================Writing Completed==============");
         };
     }
 }

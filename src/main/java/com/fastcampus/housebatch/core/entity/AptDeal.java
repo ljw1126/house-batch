@@ -49,8 +49,9 @@ public class AptDeal {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    public static AptDeal from(AptDealDto dto) {
+    public static AptDeal from(AptDealDto dto, Apt apt) {
         AptDeal aptDeal = new AptDeal();
+        aptDeal.setApt(apt);
         aptDeal.setExclusiveArea(dto.getExclusiveArea());
         aptDeal.setDealDate(dto.getDealDate());
         aptDeal.setDealAmount(dto.getDealAmount());
